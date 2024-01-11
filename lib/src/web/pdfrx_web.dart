@@ -125,6 +125,7 @@ class PdfDocumentFactoryImpl extends PdfDocumentFactory {
     Uri uri, {
     String? password,
     PdfPasswordProvider? passwordProvider,
+    PdfDownloadProgressCallback? progressCallback,
   }) =>
       openFile(
         uri.path,

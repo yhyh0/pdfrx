@@ -213,11 +213,13 @@ class PdfDocumentFactoryImpl extends PdfDocumentFactory {
     Uri uri, {
     String? password,
     PdfPasswordProvider? passwordProvider,
+    PdfDownloadProgressCallback? progressCallback,
   }) =>
       pdfDocumentFromUri(
         uri,
         password: password,
         passwordProvider: passwordProvider,
+        progressCallback: progressCallback,
       );
 
   static bool _isPasswordError({int? error}) {

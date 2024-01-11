@@ -38,7 +38,7 @@ class PdfViewer extends StatefulWidget {
           key: key,
           documentRef: (store ?? PdfDocumentStore.defaultStore).load(
             '##PdfViewer:asset:$name',
-            documentLoader: () =>
+            documentLoader: (_) =>
                 PdfDocument.openAsset(name, password: password),
           ),
           controller: controller,
@@ -58,7 +58,7 @@ class PdfViewer extends StatefulWidget {
           key: key,
           documentRef: (store ?? PdfDocumentStore.defaultStore).load(
             '##PdfViewer:file:$path',
-            documentLoader: () =>
+            documentLoader: (_) =>
                 PdfDocument.openFile(path, password: password),
           ),
           controller: controller,
@@ -78,7 +78,11 @@ class PdfViewer extends StatefulWidget {
           key: key,
           documentRef: (store ?? PdfDocumentStore.defaultStore).load(
             '##PdfViewer:uri:$uri',
-            documentLoader: () => PdfDocument.openUri(uri, password: password),
+            documentLoader: (progressCallback) => PdfDocument.openUri(
+              uri,
+              password: password,
+              progressCallback: progressCallback,
+            ),
           ),
           controller: controller,
           params: displayParams,
@@ -98,7 +102,7 @@ class PdfViewer extends StatefulWidget {
           key: key,
           documentRef: (store ?? PdfDocumentStore.defaultStore).load(
             '##PdfViewer:data:${sourceName ?? bytes.hashCode}',
-            documentLoader: () => PdfDocument.openData(bytes,
+            documentLoader: (_) => PdfDocument.openData(bytes,
                 password: password, sourceName: sourceName),
           ),
           controller: controller,
@@ -121,7 +125,7 @@ class PdfViewer extends StatefulWidget {
           key: key,
           documentRef: (store ?? PdfDocumentStore.defaultStore).load(
             '##PdfViewer:custom:$sourceName',
-            documentLoader: () => PdfDocument.openCustom(
+            documentLoader: (_) => PdfDocument.openCustom(
                 read: read,
                 fileSize: fileSize,
                 sourceName: sourceName,
@@ -262,7 +266,13 @@ class _PdfViewerState extends State<PdfViewer>
 
   @override
   Widget build(BuildContext context) {
-    if (_document == null) return Container();
+    if (_document == null) {
+      return widget.params.loadingBannerBuilder?.call(
+              context,
+              widget.documentRef.bytesDownloaded,
+              widget.documentRef.totalBytes) ??
+          Container();
+    }
     return LayoutBuilder(builder: (context, constraints) {
       if (_calcViewSizeAndCoverScale(
           Size(constraints.maxWidth, constraints.maxHeight))) {
