@@ -342,7 +342,22 @@ class _PdfViewerState extends State<PdfViewer>
                       size: _layout!.documentSize,
                     ),
                   ),
-                  ..._buildPageOverlayWidgets(),
+                  //  if (widget.params.enableTextSelection)
+                  StreamBuilder(
+                    stream: _stream.throttleTime(
+                      const Duration(milliseconds: 200),
+                      leading: false,
+                      trailing: true,
+                    ),
+                    builder: (context, snapshot) {
+                      return ClipRect(
+                        child: Stack(
+                          children: [..._buildPageOverlayWidgets()],
+                        ),
+                      );
+                    },
+                  ),
+                  // ..._buildPageOverlayWidgets(),
                   if (widget.params.viewerOverlayBuilder != null)
                     ...widget.params.viewerOverlayBuilder!(
                         context, _controller!.viewSize)
@@ -455,7 +470,7 @@ class _PdfViewerState extends State<PdfViewer>
       (z1 - z2).abs() < 0.01;
 
   List<Widget> _buildPageOverlayWidgets() {
-    if (widget.params.pageOverlayBuilder == null) return [];
+    // if (widget.params.pageOverlayBuilder == null) return [];
     final renderBox = context.findRenderObject();
     if (renderBox is! RenderBox) return [];
     Rect? documentToRenderBox(Rect rect) {
@@ -479,6 +494,16 @@ class _PdfViewerState extends State<PdfViewer>
       final page = _document!.pages[i];
       final rectExternal = documentToRenderBox(rect);
       if (rectExternal != null) {
+        //enableTextSelection: true
+        widgets.add(_PdfPageText(
+          key: Key('_PdfPageText#$i'),
+          page: page,
+          pageRect: rectExternal,
+          viewerState: this,
+        ));
+
+        if (widget.params.pageOverlayBuilder == null) continue;
+
         final overlay = widget.params.pageOverlayBuilder!(
           context,
           rectExternal,

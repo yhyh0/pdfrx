@@ -38,10 +38,11 @@ class _MyAppState extends State<MyApp> {
             PdfViewer.uri(
               Uri.parse(kIsWeb
                   ? 'assets/assets/hello.pdf'
-                  : 'https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf'),
+                  : 'https://www.africau.edu/images/default/sample.pdf'),
               controller: controller,
               displayParams: PdfViewerParams(
                 maxScale: 8,
+                // enableTextSelection: true,
                 // code to display pages horizontally
                 // layoutPages: (pages, params) {
                 //   final height = pages.fold(
