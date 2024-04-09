@@ -877,10 +877,15 @@ class _PdfViewerState extends State<PdfViewer>
         annotationRenderingMode: widget.params.annotationRenderingMode,
         cancellationToken: cancellationToken,
       );
+
       if (img == null) return;
+
+      _realSized[page.pageNumber]?.image.dispose();
+
       _realSized[page.pageNumber] =
           (image: await img.createImage(), scale: scale);
-      img.dispose();
+
+      img?.dispose();
       _invalidate();
     });
   }
@@ -901,8 +906,13 @@ class _PdfViewerState extends State<PdfViewer>
     int bytesConsumed =
         _realSized.values.fold(0, (sum, e) => sum + getBytesConsumed(e.image));
     for (final key in pageNumbers) {
-      bytesConsumed -= getBytesConsumed(_realSized[key]?.image);
-      _realSized.remove(key);
+      if (_realSized.containsKey(key)) {
+        var toDispose = _realSized[key];
+        bytesConsumed -= getBytesConsumed(toDispose?.image);
+        toDispose?.image.dispose();
+        _realSized.remove(key);
+      }
+
       if (bytesConsumed <= acceptableBytes) {
         break;
       }
